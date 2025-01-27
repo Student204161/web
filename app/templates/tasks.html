@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Run GPU Tasks</h2>
+
+<!-- Form for submitting new tasks -->
+<form method="post" enctype="multipart/form-data">
+    <label for="task_type">Select Task:</label>
+    <select name="task_type" id="task_type">
+        {% for task in tasks %}
+            <option value="{{ task.id }}">{{ task.name }} - {{ task.description }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="video">Upload Video:</label>
+    <input type="file" name="video" accept=".mov,.mp4,.avi" required><br><br>
+
+    <label for="frame_count">Max number of frames to extract:</label>
+    <input type="number" name="frame_count" min="1" required><br><br>
+
+    <label for="iterations">Iterations for 3DGS:</label>
+    <input type="number" name="iterations" min="100" max="30000" value="1000" required><br><br>
+
+    <button type="submit">Run Task</button>
+</form>
+
+<!-- Display result from task submission -->
+{% if result %}
+    <h3>Result:</h3>
+    <pre>{{ result | tojson(indent=2) }}</pre>
+{% endif %}
+
+<!-- Task Status Section -->
+<h3>Task Status</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Task ID</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody id="task-list">
+        <!-- Task rows will be populated dynamically -->
+    </tbody>
+</table>
+
+<script>
+// Poll for task status updates every 3 seconds
+const pollInterval = 3000;
+
+function fetchTaskStatus() {
+    fetch('/task_status')
+        .then(response => response.json())
+        .then(data => {
+            const taskList = document.getElementById("task-list");
+            taskList.innerHTML = ""; // Clear existing rows
+
+            // Populate the table with task statuses
+            for (const [taskId, status] of Object.entries(data)) {
+                const row = document.createElement("tr");
+                row.id = `task-${taskId}`;
+
+                // Task ID
+                const idCell = document.createElement("td");
+                idCell.textContent = taskId;
+                row.appendChild(idCell);
+
+                // Status
+                const statusCell = document.createElement("td");
+                statusCell.textContent = status;
+                statusCell.className = "task-status";
+                row.appendChild(statusCell);
+
+                // Add row to the table
+                taskList.appendChild(row);
+            }
+        })
+        .catch(error => console.error("Error fetching task status:", error));
+}
+
+.task-status {
+    font-weight: bold;
+}
+.task-status.running {
+    color: orange;
+}
+.task-status.completed {
+    color: green;
+}
+.task-status.failed {
+    color: red;
+}
+
+// Start polling
+setInterval(fetchTaskStatus, pollInterval);
+
+// Fetch task status immediately on page load
+fetchTaskStatus();
+</script>
+{% endblock %}

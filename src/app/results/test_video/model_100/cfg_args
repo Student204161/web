@@ -1,0 +1,1 @@
+Namespace(sh_degree=3, source_path='/home/khalil/Desktop/webproj/web/src/app/results/test_video', model_path='src/app/results/test_video/model_100', images='images', depths='', resolution=-1, white_background=False, train_test_exp=False, data_device='cuda', eval=False)

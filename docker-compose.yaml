@@ -1,0 +1,12 @@
+version: "3"
+services:
+  trainer:
+    image: 3dgs:latest
+    build:
+      context: .
+      dockerfile: dockerfiles/3dgs.dockerfile
+  predict:
+    image: segm:latest
+    build:
+      context: .
+      dockerfile: dockerfiles/segm.dockerfile

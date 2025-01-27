@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>About This App</h2>
+    <p>{{ info.description }}</p>
+    <ul>
+        <li>Author: {{ info.author }}</li>
+        <li>Version: {{ info.version }}</li>
+    </ul>
+{% endblock %}
